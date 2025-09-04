@@ -53,12 +53,10 @@ app.use((req, res, next) => {
 connectDB()
 
 
-// Test API
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-// API routes
 app.use("/api",router)
 
 app.listen(5001, () => {
