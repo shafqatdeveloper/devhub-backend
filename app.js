@@ -12,7 +12,7 @@ app.set("trust proxy", 1);
 
 const corsOptions = {
   origin(origin, cb) {
-    if (!origin) return cb(null, true);          // Postman/curl/server-to-server
+    if (!origin) return cb(null, true);          
     if (origin === CLIENT_ORIGIN) return cb(null, true);
     return cb(new Error("Not allowed by CORS"));
   },
@@ -20,7 +20,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions));   
+// catch-all:
+app.options(/.*/, cors(corsOptions));
+// or scope to API only:
+app.options(/^\/api\/.*/, cors(corsOptions));
+
 
 app.use(express.json());
 app.use(cookieParser());

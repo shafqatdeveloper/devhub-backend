@@ -9,8 +9,8 @@ import crypto from "crypto";
 
 const cookieBase = {
     httpOnly: true,
-    secure: process.env.COOKIE_SECURE === 'true',
-    sameSite: process.env.COOKIE_SAMESITE || 'lax',
+    secure: process.env.COOKIE_SECURE,
+    sameSite: process.env.COOKIE_SAMESITE,
     path: "/"
 }
 
