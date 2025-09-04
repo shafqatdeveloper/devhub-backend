@@ -50,7 +50,7 @@ connectDB();
 
 app.get("/", (req, res) => res.send("API is up ✅"));
 
-app.use("/api/auth", authRouter);
+app.use("/api", authRouter);
 
 // ----- Start -----
 const PORT = process.env.PORT || 5001;
