@@ -1,37 +1,66 @@
-import express from "express";
-import "dotenv/config";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import { connectDB } from "./config/db.js";
-import router from "./routes/auth/auth.js";
+import express from 'express'
+import { connectDB } from './config/db.js'
+import 'dotenv/config'
+import router from './routes/auth/auth.js'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
 
-const app = express();
+const app = express()
+app.use(express.json())
+app.use(cookieParser())
+const allowedOrigins = [
+  "*",
+  "http://localhost:3000",
+  "https://devhub-shafqatdevelopers-projects.vercel.app",
+  "https://devhub-one-tau.vercel.app",
+  "https://devhub-git-main-shafqatdevelopers-projects.vercel.app",
+  "https://devhub-98022u1pl-shafqatdevelopers-projects.vercel.app",
+];
 
-const CLIENT_ORIGIN = (process.env.CLIENT_URL || "").replace(/\/$/, "");
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/devhub-one-tau.*\.vercel\.app$/.test(origin)
+      ) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.set("trust proxy", 1);
 
-const corsOptions = {
-  origin(origin, cb) {
-    if (!origin) return cb(null, true);          
-    if (origin === CLIENT_ORIGIN) return cb(null, true);
-    return cb(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-};
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
-app.use(cors(corsOptions));
-// catch-all:
-app.options(/.*/, cors(corsOptions));
-// or scope to API only:
-app.options(/^\/api\/.*/, cors(corsOptions));
+connectDB()
 
 
-app.use(express.json());
-app.use(cookieParser());
+// Test API
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
-connectDB();
+// API routes
+app.use("/api",router)
 
-app.get("/", (_req, res) => res.send("Hello World!"));
-app.use("/api", router);
-
-app.listen(5001, () => console.log("Server is running on port 5001"));
+app.listen(5001, () => {
+  console.log('Server is running on port 5001')
+})
