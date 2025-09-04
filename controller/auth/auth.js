@@ -6,13 +6,16 @@ import { sendEmail } from "../../utils/mailer.js";
 import { sha256Hash, signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from "../../utils/token.js";
 import crypto from "crypto";
 
+const PROD = process.env.NODE_ENV === "production";
 
 const cookieBase = {
-    httpOnly: true,
-    secure:process.env.NODE_ENV === "production",
-    sameSite: process.env.COOKIE_SAMESITE,
-    path: "/"
-}
+  httpOnly: true,
+  secure: PROD,               
+  sameSite: "none",            
+  domain: PROD ? ".devhub-one-tau.vercel.app" : undefined,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 7
+};
 
 
 function setAuthCookies(res, accessToken, refreshToken) {
