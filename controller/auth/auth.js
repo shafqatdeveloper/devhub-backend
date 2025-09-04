@@ -12,7 +12,7 @@ const cookieBase = {
   httpOnly: true,
   secure: true,               
   sameSite: "none",            
-  domain: ".devhub-one-tau.vercel.app",
+  domain: ".vercel.app",
   path: "/",
   maxAge: 60 * 60 * 24 * 7
 };
