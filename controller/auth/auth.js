@@ -10,9 +10,9 @@ const PROD = process.env.NODE_ENV === "production";
 
 const cookieBase = {
   httpOnly: true,
-  secure: PROD,               
+  secure: true,               
   sameSite: "none",            
-  domain: PROD ? ".devhub-one-tau.vercel.app" : undefined,
+  domain: ".devhub-one-tau.vercel.app",
   path: "/",
   maxAge: 60 * 60 * 24 * 7
 };
