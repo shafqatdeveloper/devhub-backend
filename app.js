@@ -1,59 +1,64 @@
-// server.js
-import express from "express";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import "dotenv/config";
-import { connectDB } from "./config/db.js";
-import authRouter from "./routes/auth/auth.js";
+import express from 'express'
+import { connectDB } from './config/db.js'
+import 'dotenv/config'
+import router from './routes/auth/auth.js'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
 
-const app = express();
-
-app.use(express.json());
-app.use(cookieParser());
-
-// ----- CORS (CLEAN + CORRECT) -----
-const whitelist = new Set([
+const app = express()
+app.use(express.json())
+app.use(cookieParser())
+const allowedOrigins = [
+  "*",
   "http://localhost:3000",
-  "https://devhub-one-tau.vercel.app",
   "https://devhub-shafqatdevelopers-projects.vercel.app",
+  "https://devhub-one-tau.vercel.app",
   "https://devhub-git-main-shafqatdevelopers-projects.vercel.app",
   "https://devhub-98022u1pl-shafqatdevelopers-projects.vercel.app",
-]);
+];
 
-const corsOptions = {
-  credentials: true,
-  origin(origin, cb) {
-    // Allow server-to-server/SSR/no-origin requests
-    if (!origin) return cb(null, true);
-    if (whitelist.has(origin) || /^https:\/\/devhub-one-tau.*\.vercel\.app$/.test(origin)) {
-      return cb(null, true);
-    }
-    return cb(new Error("Not allowed by CORS"));
-  },
-};
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/devhub-one-tau.*\.vercel\.app$/.test(origin)
+      ) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+app.set("trust proxy", 1);
 
 app.use((req, res, next) => {
-  // Ensure caches/CDNs don't mix responses for different origins
-  res.header("Vary", "Origin");
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
   next();
 });
 
-app.use(cors(corsOptions));
-// Preflight
-app.options(/\*/, cors(corsOptions));
+connectDB()
 
-// Trust proxy for secure cookies on Vercel/behind proxies
-app.set("trust proxy", 1);
 
-// ----- DB & Routes -----
-connectDB();
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
-app.get("/", (req, res) => res.send("API is up ✅"));
+app.use("/api",router)
 
-app.use("/api", authRouter);
-
-// ----- Start -----
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+app.listen(5001, () => {
+  console.log('Server is running on port 5001')
+})

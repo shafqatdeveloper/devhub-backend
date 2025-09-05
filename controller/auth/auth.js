@@ -6,16 +6,13 @@ import { sendEmail } from "../../utils/mailer.js";
 import { sha256Hash, signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken } from "../../utils/token.js";
 import crypto from "crypto";
 
-const PROD = process.env.NODE_ENV === "production";
 
 const cookieBase = {
-  httpOnly: true,
-  secure: true,               
-  sameSite: "none",            
-  domain: ".vercel.app",
-  path: "/",
-  maxAge: 60 * 60 * 24 * 7
-};
+    httpOnly: true,
+    secure: true,
+    sameSite: 'true',
+    path: "/"
+}
 
 
 function setAuthCookies(res, accessToken, refreshToken) {
