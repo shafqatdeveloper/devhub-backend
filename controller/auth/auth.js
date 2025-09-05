@@ -10,7 +10,7 @@ import crypto from "crypto";
 const cookieBase = {
     httpOnly: true,
     secure: true,
-    sameSite: 'true',
+    sameSite: 'none',
     path: "/"
 }
 
